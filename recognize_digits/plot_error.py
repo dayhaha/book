@@ -20,15 +20,33 @@ import sys
 def plot_log(filename):
     with open(filename, 'r') as f:
         text = f.read()
-        pattern = re.compile('Test.*? cost=([0-9]+\.[0-9]+).*?pass-([0-9]+)',
-                             re.S)
+        pattern = re.compile(
+            'AvgCost=([0-9]+\.[0-9]+).*?Test.*? cost=([0-9]+\.[0-9]+).*?pass-([0-9]+)',
+            re.S)
         results = re.findall(pattern, text)
-        cost, pass_ = zip(*results)
-        cost_float = map(float, cost)
+        train_cost, test_cost, pass_ = zip(*results)
+        train_cost_float = map(float, train_cost)
+        test_cost_float = map(float, test_cost)
         pass_int = map(int, pass_)
-        plt.plot(pass_int, cost_float, 'bo', pass_, cost_float, 'k')
+        plt.plot(pass_int, train_cost_float, 'red', label='Train Error')
+        plt.plot(pass_int, test_cost_float, 'green', label='Test Error')
         plt.ylabel('AvgCost')
         plt.xlabel('epoch')
+
+        # Now add the legend with some customizations.
+        legend = plt.legend(loc='upper center', shadow=True)
+
+        # The frame is matplotlib.patches.Rectangle instance surrounding the legend.
+        frame = legend.get_frame()
+        frame.set_facecolor('0.90')
+
+        # Set the fontsize
+        for label in legend.get_texts():
+            label.set_fontsize('large')
+
+        for label in legend.get_lines():
+            label.set_linewidth(1.5)  # the legend line width
+
         plt.show()
 
 
